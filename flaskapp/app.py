@@ -18,13 +18,68 @@ def string_to_float(price_str):
    
 
 # --------------------------------------------------------------
-# -------------------- Index Route -----------------------------
+# -------------------- login Route -----------------------------
 # --------------------------------------------------------------
 
 @app.route("/")
-def render_index():
-    all_items = db.get_item()
-    return render_template("index.html", all_items=all_items)
+def render_login():
+    return render_template('login.html')
+
+
+# --------------------------------------------------------------
+# -------------------- signup Route ----------------------------
+# --------------------------------------------------------------
+
+@app.route("/signup/", methods=['GET', 'POST'])
+def render_signup():
+        # Get form data
+    if request.method == 'POST':
+        username = request.form['form-username']
+        password = request.form['form-password']
+        confirm_pass = request.form['form-confirm-password']
+
+        if password == confirm_pass:
+        
+            new_user = {
+                'username': username,
+                'password': password,
+            }
+
+            db.add_user(new_user)
+            return redirect(url_for('render_login'))
+        else:
+            error = 'Passwords do not Match'
+            return redirect('render_signup') 
+    else:
+        return render_template('sign_up.html')       
+
+# --------------------------------------------------------------
+# -------------------- Home Route ----------------------------
+# --------------------------------------------------------------
+
+@app.route("/home/")
+def render_home():
+    return render_template('home.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # --------------------------------------------------------------
 # -------------------- Customer Routes -------------------------

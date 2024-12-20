@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1 style="text-align: center;">Create an Account</h1>
+
+<div>
+        
+
+        <div class="card" style="width:400px; padding: 1.3rem; align-content: center; margin: 0 auto;">
+
+        <form action="{{url_for('render_login')}}">
+
+            <div class="mb-3" >
+                <label for="name" class="form-label">Username:</label>
+                <input type="text" class="form-control" name="form-username" placeholder="Username" required>
+              </div>
+
+              <div class="mb-3" >
+                <label for="name" class="form-label">Password:</label>
+                <input type="password" class="form-control" name="form-password" placeholder="Password" required>
+              </div>
+
+              <div class="mb-3" >
+                <label for="name" class="form-label">Confirm Password:</label>
+                <input type="password" class="form-control" name="form-confirm-password" placeholder="Enter Password" required>
+              </div>
+
+              <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Create account</button>
+                </form>
+              </div>
+        </form>
+        </div>
+
+
+        
+    </a>
+</div>
+
+
+{% endblock %}

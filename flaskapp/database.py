@@ -24,6 +24,44 @@ def get_connection():
     )
 
 # --------------------------------------------------------------------------------------
+# ------------------------------- User functions -----------------------------------
+# --------------------------------------------------------------------------------------
+
+def add_user(user: dict[str, str]) -> None:
+    conn = get_connection()
+    with conn.cursor() as curr:
+        curr.execute(
+            "insert into users (username, password) values (%s, %s)",
+            (
+                user['username'],
+                user['password'],
+            ),
+        )
+    conn.commit()
+    conn.close()
+
+
+
+def add_customer(customer: dict[str, str]) -> None:
+    """takes a dictionary and inserts into a database table"""
+    conn = get_connection()
+    with conn.cursor() as curr:
+        curr.execute(
+            "insert into customers (name, email, phone) values (%s, %s, %s)",
+            (
+                customer["name"],
+                customer["email"],
+                customer["phone"],
+
+            ),
+        )
+    conn.commit()
+    conn.close()
+
+
+
+
+# --------------------------------------------------------------------------------------
 # ------------------------------- Customer functions -----------------------------------
 # --------------------------------------------------------------------------------------
 
@@ -222,45 +260,17 @@ def clear_cart():
 def intialize_db():
     conn = get_connection()
 
-    # creating tables for db
-    _customers = """
-    CREATE TABLE customers (
-        id int auto_increment primary key,
-        name varchar(50),
-        email varchar(50),
-        phone varchar(20)
+    _users = """
+    CREATE TABLE users (
+        id int auto_increment
+        username varchar(50),
+        password varchar(50)
     ) engine=InnoDB """
-
-    _items = """
-    CREATE TABLE items (
-        id int auto_increment primary key,
-        images tinytext,
-        name varchar(50),
-        cost varchar(50)
-    ) engine=InnoDB """
-
-    _orders = """
-    CREATE TABLE orders (
-        orderID int,
-        name varchar(50),
-        item varchar(50)
-    ) engine=InnoDB """
-
-    _cart = """
-    CREATE TABLE cart (
-        item_id int,
-        FOREIGN KEY(item_id) REFERENCES items(id)
-    ) engine=InnoDB """
+    
 
     with conn.cursor() as curr:
-        curr.execute("drop table if exists cart")
-        curr.execute("drop table if exists customers")
-        curr.execute("drop table if exists items")
-        curr.execute("drop table if exists orders")
-        curr.execute(_customers)
-        curr.execute(_items)
-        curr.execute(_orders)
-        curr.execute(_cart)
+        curr.execute("drop table if exists users")
+        curr.execute(_users)
     conn.commit()
     conn.close()
 
@@ -268,15 +278,3 @@ def intialize_db():
 
 if __name__ == "__main__":
     intialize_db()
-
-    with open("customers.csv") as csvf:
-        for customer in csv.DictReader(csvf):
-            add_customer(customer)
-
-    with open("items.csv") as csvf:
-        for item in csv.DictReader(csvf):
-            add_item(item)
-    
-    with open('orders.csv') as csvf:
-        for order in csv.DictReader(csvf):
-            add_order(order)

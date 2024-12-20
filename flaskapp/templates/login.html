@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1 style="text-align: center;">Welcome to your Personal Budget Calculator</h1>
+<br><br>
+<h1 style="text-align: center;">Login or Sign Up</h1>
+
+<div>
+        
+
+        <div class="card" style="width:400px; padding: 1.3rem; align-content: center; margin: 0 auto;">
+
+          <form action="{{url_for('render_home')}}" method="POST">
+            <div class="mb-3" >
+                <label for="name" class="form-label">Username:</label>
+                <input type="text" class="form-control" name="form-name" placeholder="Username" required>
+              </div>
+
+              <div class="mb-3" >
+                <label for="name" class="form-label">Password:</label>
+                <input type="text" class="form-control" name="form-name" placeholder="Password" required>
+              </div>
+              
+              <div class="mb-3">
+                <form action="#">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+              </div>
+
+              <div class="mb-3">
+                <a href="{{url_for('render_signup')}}">
+                    Don't have an account? Sign up here
+              </div>
+          </form>
+
+        </div>
+
+
+        
+    </a>
+</div>
+
+
+{% endblock %}
