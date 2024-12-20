@@ -1,0 +1,228 @@
+# Copyright © 2023-2024, Indiana University
+# BSD 3-Clause License
+# imports
+from flask import Flask, render_template, url_for, request, redirect
+from collections import defaultdict
+import flaskapp.database as db
+import random
+app = Flask(__name__)
+
+
+# Comments
+# deleted all csv functions as requsted
+
+# Function to clean cost in items
+def string_to_float(price_str):
+    cleaned_str = price_str.replace('$', '').strip()
+    return round(float(cleaned_str), 2) 
+   
+
+# --------------------------------------------------------------
+# -------------------- Index Route -----------------------------
+# --------------------------------------------------------------
+
+@app.route("/")
+def render_index():
+    all_items = db.get_item()
+    return render_template("index.html", all_items=all_items)
+
+# --------------------------------------------------------------
+# -------------------- Customer Routes -------------------------
+# --------------------------------------------------------------
+
+# Renders customers page
+@app.route('/customers/')
+def render_customers():
+    all_customers = db.get_customer()
+    return render_template("customers.html", all_customers=all_customers)
+
+
+# Directs to adds page where users can add a new customer then redirected back to customers page
+@app.route("/customers/add/", methods=['GET', 'POST'])
+def render_customer_form():
+
+    if request.method == "POST":
+        # Get form data
+        customer_name = request.form['form-name']
+        email = request.form['form-email']
+        phone = request.form['form-phone']
+        
+        # Processing step 1: Put data into a dictionary
+        new_customer = {
+            'name': customer_name,
+            'email': email,
+            'phone': phone
+        }
+
+        # Processing step 2: Add new data to CSV
+        db.add_customer(new_customer)
+        # Redirect to customers list page
+        return redirect(url_for('render_customers'))  
+    else:
+        return render_template("customer_form.html",customer = None, action='add')
+
+
+# Directs to edits page where user can edit a current customer then redirected back to customers page
+@app.route("/customers/edit/<customer_id>", methods=['GET', 'POST'])
+def render_customer_form_edit(customer_id):
+    # load one customer
+    
+    customer = db.get_one_customer(customer_id)
+
+    if request.method == 'POST':
+        # Get the form data
+        new_name = request.form['form-name']
+        new_email = request.form['form-email']
+        new_phone = request.form['form-phone']
+
+        # Update the customer data
+        db.update_customer(customer_id, new_name, new_email, new_phone)
+
+        
+        return redirect(url_for('render_customers'))
+    
+    return render_template("customer_form.html", customer=customer, action='edit')    
+
+# --------------------------------------------------------------
+# -------------------- Item Routes -----------------------------
+# --------------------------------------------------------------
+
+# Renders items page
+@app.route('/items/')
+def render_items():
+    all_items = db.get_item()
+    return render_template('items.html', all_items=all_items)
+
+# Directs user to adds page where user can add a new item then redirected back to items page
+@app.route("/items/add/", methods=['GET', 'POST'])
+def render_item_form():
+    if request.method == "POST":
+# get form data
+        image = 'images/bread.jpg' 
+        # bread here is a place holder image since image isnt required
+        name = request.form['form-name']
+        cost = request.form['form-cost']
+# processing step 1: put data to dictionary
+        new_item = {
+            'images': image,
+            'name': name,
+            'cost': cost
+        }
+
+# processing step 2: add new data to csv
+        db.add_item(new_item)
+        # result: redirect to home page route
+        return redirect(url_for('render_index'))
+    else:
+        # view customersw
+        return render_template("item_form.html", item=None, action='add')
+    
+
+# Directs user to edits page where user can edit a current item then redirected back to items page
+@app.route("/items/edit/<item_id>", methods=['GET', 'POST'])
+def render_item_form_edit(item_id):
+    # load items
+    item = db.get_one_item(item_id)
+
+    # get form data
+    if request.method == 'POST':
+        new_item = request.form['form-name']
+        new_cost = request.form['form-cost']
+
+        # updating form data
+        
+        db.update_item(item_id, new_item, new_cost)
+
+        return redirect(url_for('render_items'))
+
+    return render_template('item_form.html', item=item, action='edit')
+
+# --------------------------------------------------------------
+# -------------------- Order Routes ---------------------------
+# --------------------------------------------------------------
+
+@app.route('/orders/')
+def render_order():
+    all_orders = db.get_order()
+
+    return render_template('orders.html', all_orders=all_orders)
+
+
+@app.route('/order_details/<id>')
+def render_order_detail(id):    
+    order = db.get_one_order(id)
+    all_orders = db.get_order()
+
+    order_details = []
+    for item in all_orders:
+        if item['orderID'] == order['orderID']:
+            order_details.append(item['item'])
+    
+    
+    return render_template('order_details.html', order=order,all_orders=all_orders, order_details=order_details)
+
+
+# --------------------------------------------------------------
+# -------------------- Cart Routes -------------------------
+# --------------------------------------------------------------
+
+# Renders cart page
+@app.route('/cart/', methods=['GET', 'POST'])
+def render_cart():
+    cart = db.get_cart()
+    all_customers = db.get_customer()
+    total = 0
+
+    if cart:
+        action ='added'
+        total = 0
+        # calc subtotal
+        for item in cart:
+            if 'cost' in item and item['cost']:
+                cost_float = string_to_float(item['cost'])  # Convert cost to float
+                total += cost_float 
+        total = round(total, 2)  
+
+    else:
+        action = 'empty'
+
+    return render_template('cart.html', cart=cart, action=action, all_customers=all_customers, total=total)
+
+
+# Allows users to add items to the cart page
+@app.route("/cart/add/<item_id>", methods=['GET', 'POST'])
+def render_add_item_to_cart(item_id):
+    item = db.get_one_item(item_id)
+
+    if request.method == 'POST':
+        db.add_item_to_cart(item)
+        cart = db.get_cart()
+        return redirect(url_for('render_index'))
+
+    return render_template('cart.html', cart=cart)
+
+
+# Allows users to clear cart from cart page - redirected back to home page page (empty)
+@app.route('/cart/clear/', methods = ['GET', 'POST'])
+def render_clear_cart():
+    db.clear_cart()
+    return redirect(url_for('render_index'))
+
+# Allow users to checkout from cart
+@app.route('/cart/checkout/', methods=['POST'])
+def render_cart_checkout():
+    
+    cart = db.get_cart()
+    num = random.randint(1,100000000)
+    custname = request.form['dropdown']
+
+    for item in cart:
+        order = {
+            'orderID': num,
+            'name': custname,
+            'item': item['name']
+        }
+        db.add_order(order)
+    db.clear_cart()
+
+    return redirect(url_for('render_order'))
