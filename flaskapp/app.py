@@ -21,9 +21,19 @@ def string_to_float(price_str):
 # -------------------- login Route -----------------------------
 # --------------------------------------------------------------
 
-@app.route("/")
+@app.route("/",  methods=['GET', 'POST'])
 def render_login():
-    return render_template('login.html')
+    users = db.get_users()
+    if request.method=='POST':
+        email = request.form['form-email']
+        password = request.form['form-password']
+        
+        for user in users:
+            if user['email'] == email and user['password'] == password:
+                return render_home_user(user['id'])
+    
+        return render_template('login.html', action='invalid_login')
+    return render_template('login.html', action='pass')
 
 
 # --------------------------------------------------------------
@@ -33,33 +43,38 @@ def render_login():
 @app.route("/signup/", methods=['GET', 'POST'])
 def render_signup():
         # Get form data
+    user_emails = db.get_email()
+
     if request.method == 'POST':
-        username = request.form['form-username']
+        email = request.form['form-email']
         password = request.form['form-password']
         confirm_pass = request.form['form-confirm-password']
 
-        if password == confirm_pass:
-        
-            new_user = {
-                'username': username,
-                'password': password,
-            }
-
-            db.add_user(new_user)
-            return redirect(url_for('render_login'))
+        if email in user_emails:
+            return render_template('sign_up.html', action='email_exists')
         else:
-            error = 'Passwords do not Match'
-            return redirect('render_signup') 
-    else:
-        return render_template('sign_up.html')       
+            if password == confirm_pass:
+                new_user = {
+                    'email': email,
+                    'password': password,
+                }
 
+                db.add_user(new_user)
+                return redirect(url_for('render_login'))
+            else:
+                return render_template('sign_up.html', action ='incorreect_password')
+    return render_template('sign_up.html', user_emails=user_emails, action='pass')    
+        
+
+            
 # --------------------------------------------------------------
 # -------------------- Home Route ----------------------------
 # --------------------------------------------------------------
 
-@app.route("/home/")
-def render_home():
-    return render_template('home.html')
+@app.route("/home/<id>")
+def render_home_user(id):
+    user = db.get_one_user(id)
+    return render_template('home.html', user=user)
 
 
 

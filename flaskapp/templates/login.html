@@ -9,18 +9,17 @@
 
 <div>
         
-
+  {% if action =='pass' %}
         <div class="card" style="width:400px; padding: 1.3rem; align-content: center; margin: 0 auto;">
-
-          <form action="{{url_for('render_home')}}" method="POST">
+          <form action="{{url_for('render_login')}}" method="POST">
             <div class="mb-3" >
-                <label for="name" class="form-label">Username:</label>
-                <input type="text" class="form-control" name="form-name" placeholder="Username" required>
+                <label for="name" class="form-label">Email:</label>
+                <input type="text" class="form-control" name="form-email" placeholder="Email" required>
               </div>
 
               <div class="mb-3" >
                 <label for="name" class="form-label">Password:</label>
-                <input type="text" class="form-control" name="form-name" placeholder="Password" required>
+                <input type="password" class="form-control" name="form-password" placeholder="Password" required>
               </div>
               
               <div class="mb-3">
@@ -32,15 +31,19 @@
               <div class="mb-3">
                 <a href="{{url_for('render_signup')}}">
                     Don't have an account? Sign up here
+                </a>
               </div>
           </form>
 
-        </div>
-
-
-        
-    </a>
+        </div>  
+  {% elif action=='invalid_login'%}
+    <div class="mb-3" style="width:400px; padding: 1.3rem; align-content: center; margin: 0 auto;">
+      <a href="{{url_for('render_login')}}">
+        <button type="submit" class="btn btn-primary">Invalid email or password, please try again</button>
+      </a>
+    </div>
 </div>
+{% endif %}
 
 
 {% endblock %}

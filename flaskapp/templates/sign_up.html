@@ -7,34 +7,45 @@
 
 <div>
         
+  {% if action == 'pass' %}
+      <div class="card" style="width:400px; padding: 1.3rem; align-content: center; margin: 0 auto;">
+    
+      <form action="{{url_for('render_signup')}}" method="POST">
 
-        <div class="card" style="width:400px; padding: 1.3rem; align-content: center; margin: 0 auto;">
-
-        <form action="{{url_for('render_login')}}">
+          <div class="mb-3" >
+              <label for="name" class="form-label">Email:</label>
+              <input type="text" class="form-control" name="form-email" placeholder="email" required>
+            </div>
 
             <div class="mb-3" >
-                <label for="name" class="form-label">Username:</label>
-                <input type="text" class="form-control" name="form-username" placeholder="Username" required>
-              </div>
+              <label for="name" class="form-label">Password:</label>
+              <input type="password" class="form-control" name="form-password" placeholder="Password" required>
+            </div>
 
-              <div class="mb-3" >
-                <label for="name" class="form-label">Password:</label>
-                <input type="password" class="form-control" name="form-password" placeholder="Password" required>
-              </div>
+            <div class="mb-3" >
+              <label for="name" class="form-label">Confirm Password: {{error}}</label>
+              <input type="password" class="form-control" name="form-confirm-password" placeholder="Enter Password" required>
+            </div>
+            
+            <div class="mb-3">
+                  <button type="submit" class="btn btn-primary">Create account</button>
+            </div>
+      </form>
+      </div>
+    {% elif action == 'email_exists' %}
+    <div class="mb-3" style="width:400px; padding: 1.3rem; align-content: center; margin: 0 auto;">
+      <a href="{{url_for('render_signup')}}">
+        <button type="submit" class="btn btn-primary">Email already exists, please login</button>
+      </a>
+    </div>
 
-              <div class="mb-3" >
-                <label for="name" class="form-label">Confirm Password:</label>
-                <input type="password" class="form-control" name="form-confirm-password" placeholder="Enter Password" required>
-              </div>
-
-              <div class="mb-3">
-                    <button type="submit" class="btn btn-primary">Create account</button>
-                </form>
-              </div>
-        </form>
-        </div>
-
-
+    {% elif action == 'incorrect_password' %}
+      <div class="mb-3" style="width:400px; padding: 1.3rem; align-content: center; margin: 0 auto;">
+        <a href="{{url_for('render_signup')}}">
+          <button type="submit" class="btn btn-primary">Passwords do not match, try again</button>
+        </a>
+      </div>
+    {% endif %}
         
     </a>
 </div>
