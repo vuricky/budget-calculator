@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% extends "baselogin.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Sign Up{% endblock %}
 
 {% block content %}
 <h1 style="text-align: center;">Create an Account</h1>
@@ -11,6 +11,11 @@
       <div class="card" style="width:400px; padding: 1.3rem; align-content: center; margin: 0 auto;">
     
       <form action="{{url_for('render_signup')}}" method="POST">
+
+          <div class="mb-3" >
+            <label for="name" class="form-label">Name:</label>
+            <input type="text" class="form-control" name="form-name" placeholder="name" required>
+          </div>
 
           <div class="mb-3" >
               <label for="name" class="form-label">Email:</label>
@@ -47,7 +52,7 @@
       </div>
     {% endif %}
         
-    </a>
+    
 </div>
 
 

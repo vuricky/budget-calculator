@@ -46,6 +46,7 @@ def render_signup():
     user_emails = db.get_email()
 
     if request.method == 'POST':
+        name = request.form['form-name']
         email = request.form['form-email']
         password = request.form['form-password']
         confirm_pass = request.form['form-confirm-password']
@@ -55,6 +56,7 @@ def render_signup():
         else:
             if password == confirm_pass:
                 new_user = {
+                    'name': name,
                     'email': email,
                     'password': password,
                 }
@@ -62,7 +64,7 @@ def render_signup():
                 db.add_user(new_user)
                 return redirect(url_for('render_login'))
             else:
-                return render_template('sign_up.html', action ='incorreect_password')
+                return render_template('sign_up.html', action ='incorrect_password')
     return render_template('sign_up.html', user_emails=user_emails, action='pass')    
         
 

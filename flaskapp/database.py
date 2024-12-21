@@ -1,4 +1,3 @@
-import csv
 import os
 import pymysql
 import pymysql.cursors
@@ -31,8 +30,9 @@ def add_user(user: dict[str, str]) -> None:
     conn = get_connection()
     with conn.cursor() as curr:
         curr.execute(
-            "insert into users (email, password) values (%s, %s)",
+            "insert into users (name, email, password) values (%s, %s, %s)",
             (
+                user['name'],
                 user['email'],
                 user['password'],
             ),
@@ -84,6 +84,7 @@ def intialize_db():
     _users = """
     CREATE TABLE users (
         id int auto_increment primary key,
+        name varchar(50),
         email varchar(50),
         password varchar(50)
     ) engine=InnoDB """
