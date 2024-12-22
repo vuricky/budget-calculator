@@ -73,11 +73,69 @@ def render_signup():
 # -------------------- Home Route ----------------------------
 # --------------------------------------------------------------
 
-@app.route("/home/<id>")
+@app.route("/home/<id>", methods=['GET', 'POST'])
 def render_home_user(id):
     user = db.get_one_user(id)
-    return render_template('home.html', user=user)
+    return render_template('home.html', user=user, action='empty')
 
+@app.route("/home/budget/<id>", methods=['GET', 'POST'])
+def render_home_user_budget(id):
+
+    user = db.get_one_user(id)
+
+    if request.method == 'POST':
+
+        # adding user budget request
+
+        expenses = request.form['expenses-percentage']
+        wants = request.form['wants-percentage']
+        savings = request.form['savings-percentage']
+
+        budget = {
+            'user_id': user,
+            'expenses': expenses,
+            'wants': wants,
+            'savings': savings,
+        }
+
+        db.add_budget(budget)
+
+        # calculate user income, expenses, wants, savings
+
+        sum_income = (
+            request.form['main-income'] + 
+            request.form['passive'] + 
+            request.form['other']
+            )
+        sum_expenses = (
+            request.form['mortgage'] +
+            request.form['utilities'] +
+            request.form['transportation'] +
+            request.form['groceries'] +
+            request.form['insurance'] +
+            request.form['debt']
+        )
+        sum_wants = (
+            request.form['personal'] +
+            request.form['dining'] +
+            request.form['shopping']
+        )
+        sum_savings = (
+            request.form['savings'] +
+            request.form['emergency-fund'] +
+            request.form['retirement'] 
+        )
+
+        user_budget = {
+            'user_id': user,
+            'income': sum_income,
+            'expenses': sum_expenses,
+            'wants': sum_wants,
+            'savings': sum_savings,
+        }
+
+        db.add_user_spending(user_budget)
+    return render_template('home.html', user=user, )
 
 
 

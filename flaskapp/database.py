@@ -23,7 +23,7 @@ def get_connection():
     )
 
 # --------------------------------------------------------------------------------------
-# ------------------------------- User functions -----------------------------------
+# ----------------- User functions for signing up and logining in ----------------------
 # --------------------------------------------------------------------------------------
 
 def add_user(user: dict[str, str]) -> None:
@@ -73,9 +73,42 @@ def get_one_user(id):
 
 
 
-
 # --------------------------------------------------------------------------------------
-# -------------------- Creating the four tables for the data base ----------------------
+# ---------------------------- User budget functions ----------------------------------
+# --------------------------------------------------------------------------------------
+
+def add_budget(budget: dict[str, str]) -> None:
+    conn = get_connection()
+    with conn.cursor() as curr:
+        curr.execute(
+            "insert into budget (expenses, wants, savings) values (%s, %s, %s)",
+            (
+                
+                budget['expenses'],
+                budget['wants'],
+                budget['savings'],
+            )
+        )
+    conn.commit()
+    conn.close()
+
+def add_user_spending(spending :dict[str,str]) -> None:
+    conn = get_connection()
+    with conn.cursor() as curr:
+        curr.execute(
+            "insert into user_budget (income, expenses, wants, savings) values (%s, %s, %s, %s)",
+            (
+                spending['income'],
+                spending['expenses'],
+                spending['wants'],
+                spending['savings'],
+
+            )
+        )
+    conn.commit()
+    conn.close()
+# --------------------------------------------------------------------------------------
+# -------------------- Creating the tables for the data base ---------------------------
 # --------------------------------------------------------------------------------------
 
 def intialize_db():
@@ -89,10 +122,38 @@ def intialize_db():
         password varchar(50)
     ) engine=InnoDB """
 
+    _budget = """
+    CREATE TABLE budget (
+        user_id INT not null,
+        expenses decimal(5,2) NOT NULL,
+        wants decimal(5,2) NOT NULL,
+        savings decimal(5,2) NOT NULL,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    ) engine=InnoDB """
+
+    _user_budget = """
+    CREATE TABLE user_budget (
+        user_id INT NOT NULL,
+        income decimal(10,2) NOT NULL,
+        expenses decimal(10,2) NOT NULL,
+        wants decimal(10,2) NOT NULL,
+        savings decimal(10,2) NOT NULL,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    ) engine=InnoDB """
+
+
+# --------------------------------------------------------------------------------------
+# ------------------- Resets data base when the database is run ------------------------
+# --------------------------------------------------------------------------------------
+
 
     with conn.cursor() as curr:
+        curr.execute("drop table if exists user_budget")
+        curr.execute("drop table if exists budget")
         curr.execute("drop table if exists users")
         curr.execute(_users)
+        curr.execute(_budget)
+        curr.execute(_user_budget)
     conn.commit()
     conn.close()
 

@@ -5,13 +5,157 @@
 {% block content %}
 
 
-<h1 style="text-align: left;">Hi {{user['name']}}, Ready to Create a Budget?</h1>
+<h1 style="text-align: center;">Hi {{user['name']}}, Ready to Create a Budget?</h1>
 <br>
-
-    <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-5">
-
-        
-
+<p>Please enter the following based on one month of your spending and income:</p>
+<p>
+    Reminder: It is recommended that you split your budget by the 50/30/20 rule - 50% for
+    needs, 30% for wants, and 20% for savings. However, you may input your own numbers for
+    your own desires. 
+</p>
+{% if action =='empty' %}
+<form action="{{url_for('render_home_user_budget', id=user['id']) }}" method="POST">
+    <!-- user inputs for percentages for what they want to allocate their income towards -->
+    <div class="row">
+        <div class="col-auto">
+            <label for="expenses-percentage" class="form-label">Expenses</label>
+            <div class="input-group mb-3 w-auto">
+                <input type="number" class="form-control" name="expenses-percentage" placeholder="0" required>
+                <span class="input-group-text">%</span>
+            </div>
+            <label for="wants-percentage" class="form-label">Wants</label>
+            <div class="input-group mb-3 w-auto">
+                <input type="number" class="form-control" name="wants-percentage" placeholder="0" required>
+                <span class="input-group-text">%</span>
+            </div>
+            <label for="savings-percentage" class="form-label">Savings</label>
+            <div class="input-group mb-3 w-auto">
+                <input type="number" class="form-control" name="savings-percentage" placeholder="0" required>
+                <span class="input-group-text">%</span>
+            </div>
+            
+        </div>
     </div>
+    
+    <!-- a row of four columns each separated into income, expenses, wants, and savings with user inputs -->
+    <div class="row pt-4">
+        <form action="#">
+            <div class="row">
+                <div class="col-sm" >
+                    <h2>Income</h2>
+                    <label for="main-income" class="form-label">Main Source of Income:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="main-income" placeholder="0.00" required>
+                    </div>
+                    
+                    [<label for="passive" class="form-label">Passive Income:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="passive" placeholder="0.00" required>
+                    </div>
+                    
+                    <label for="other" class="form-label">Other:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="other" placeholder="0.00" required>
+                    </div>
 
+                </div>
+                <div class="col-sm" >
+                    <h2>Expenses</h2>
+                    <label for="mortgage" class="form-label">Mortgage/Rent:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="mortgage" placeholder="0.00" required>
+                    </div>
+
+                    <label for="utilities" class="form-label">Utilities:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control"  name="mortgage" placeholder="0.00" required>
+                    </div>
+
+                    <label for="transportation" class="form-label">Transportation:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="transportation" placeholder="0.00" required>
+                    </div>
+
+                    <label for="groceries" class="form-label">Groceries:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="groceries" placeholder="0.00" required>
+                    </div>
+
+                    <label for="insurance" class="form-label">Insurance:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="insurance" placeholder="0.00" required>
+                    </div>
+
+                    <label for="debt" class="form-label">Debt:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="debt" placeholder="0.00" required>
+                    </div>
+                </div>
+
+                <div class="col-sm" >
+                    <h2>Wants</h2>
+
+                    <label for="personal" class="form-label">Personal entertainment:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="personal" placeholder="0.00" required>
+                    </div>
+
+                    <label for="dining" class="form-label">Dining:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="dining" placeholder="0.00" required>
+                    </div>
+
+                    <label for="shopping" class="form-label">Shopping:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="shopping" placeholder="0.00" required>
+                    </div>
+                </div>
+
+                <div class="col-sm" >
+                    <h2>Savings</h2>
+
+                    <label for="savings" class="form-label">Savings:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="savings" placeholder="0.00" required>
+                    </div>
+
+                    <label for="emergency-fund" class="form-label">Emergency Fund:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="emergency-fund" placeholder="0.00" required>
+                    </div>
+
+                    <label for="retirement" class="form-label">Retirement:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" name="retirement" placeholder="0.00" required>
+                    </div>
+                </div>
+            </div>
+            
+            <br>
+    </div>
+    <!-- user submits here and is redirected to a new home page -->
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+{% elif action=='budget' %}
+
+{{user}}
+
+{% endif %}
+    
 {% endblock %}
