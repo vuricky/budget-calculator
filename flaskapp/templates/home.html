@@ -13,8 +13,10 @@
     needs, 30% for wants, and 20% for savings. However, you may input your own numbers for
     your own desires. 
 </p>
-{% if action =='empty' %}
-<form action="{{url_for('render_home_user_budget', id=user['id']) }}" method="POST">
+
+{% if budget == () %}
+{{user}}
+<form action="{{url_for('render_home_user', id=user['id']) }}" method="POST">
     <!-- user inputs for percentages for what they want to allocate their income towards -->
     <div class="row">
         <div class="col-auto">
@@ -49,7 +51,7 @@
                         <input type="number" class="form-control" name="main-income" placeholder="0.00" required>
                     </div>
                     
-                    [<label for="passive" class="form-label">Passive Income:</label>
+                    <label for="passive" class="form-label">Passive Income:</label>
                     <div class="input-group mb-3">
                         <span class="input-group-text">$</span>
                         <input type="number" class="form-control" name="passive" placeholder="0.00" required>
@@ -73,7 +75,7 @@
                     <label for="utilities" class="form-label">Utilities:</label>
                     <div class="input-group mb-3">
                         <span class="input-group-text">$</span>
-                        <input type="number" class="form-control"  name="mortgage" placeholder="0.00" required>
+                        <input type="number" class="form-control"  name="utilities" placeholder="0.00" required>
                     </div>
 
                     <label for="transportation" class="form-label">Transportation:</label>
@@ -152,10 +154,17 @@
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 
-{% elif action=='budget' %}
+{% elif budget == {} %}
 
-{{user}}
+<p>
+    {{user['name']}} You have created a budget, would you like to create a new one?
+    <a href="render_clear_budget, id=user['id']">
+        <button type="submit" class="btn btn-danger">Restart Budget</button>
+    </a>
+</p>
 
 {% endif %}
+
+
     
 {% endblock %}

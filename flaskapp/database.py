@@ -72,18 +72,38 @@ def get_one_user(id):
     return user
 
 
-
 # --------------------------------------------------------------------------------------
 # ---------------------------- User budget functions ----------------------------------
 # --------------------------------------------------------------------------------------
+
+def get_budget(id):
+    conn = get_connection()
+    with conn.cursor() as curr:
+        curr.execute("SELECT * FROM budget WHERE user_id =%s", (id))
+        budget = curr.fetchone()
+    conn.commit()
+    conn.close()
+    return budget
+
+def clear_budget():
+    conn = get_connection()
+    with conn.cursor() as curr:
+        curr.execute(
+            'delete from budget',
+            'delete from user_budget'
+        )
+    conn.commit()
+    conn.close()
+
+
 
 def add_budget(budget: dict[str, str]) -> None:
     conn = get_connection()
     with conn.cursor() as curr:
         curr.execute(
-            "insert into budget (expenses, wants, savings) values (%s, %s, %s)",
+            "insert into budget (user_id, expenses, wants, savings) values (%s, %s, %s, %s)",
             (
-                
+                budget['user_id'],
                 budget['expenses'],
                 budget['wants'],
                 budget['savings'],
@@ -96,8 +116,9 @@ def add_user_spending(spending :dict[str,str]) -> None:
     conn = get_connection()
     with conn.cursor() as curr:
         curr.execute(
-            "insert into user_budget (income, expenses, wants, savings) values (%s, %s, %s, %s)",
+            "insert into user_budget (user_id, income, expenses, wants, savings) values (%s, %s, %s, %s, %s)",
             (
+                spending['user_id'],
                 spending['income'],
                 spending['expenses'],
                 spending['wants'],
@@ -125,9 +146,9 @@ def intialize_db():
     _budget = """
     CREATE TABLE budget (
         user_id INT not null,
-        expenses decimal(5,2) NOT NULL,
-        wants decimal(5,2) NOT NULL,
-        savings decimal(5,2) NOT NULL,
+        expenses decimal(10,2) NOT NULL,
+        wants decimal(10,2) NOT NULL,
+        savings decimal(10,2) NOT NULL,
         FOREIGN KEY(user_id) REFERENCES users(id)
     ) engine=InnoDB """
 

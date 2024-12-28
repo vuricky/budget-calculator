@@ -8,14 +8,12 @@ import random
 app = Flask(__name__)
 
 
-# Comments
-# deleted all csv functions as requsted
+
 
 # Function to clean cost in items
 def string_to_float(price_str):
     cleaned_str = price_str.replace('$', '').strip()
     return round(float(cleaned_str), 2) 
-   
 
 # --------------------------------------------------------------
 # -------------------- login Route -----------------------------
@@ -23,18 +21,26 @@ def string_to_float(price_str):
 
 @app.route("/",  methods=['GET', 'POST'])
 def render_login():
+
+    # gets all users
     users = db.get_users()
+
+    # gets form info
     if request.method=='POST':
         email = request.form['form-email']
         password = request.form['form-password']
         
+        # loops through user db and checks password match
         for user in users:
             if user['email'] == email and user['password'] == password:
-                return render_home_user(user['id'])
-    
+                # redirects user to their home page
+                return redirect(url_for('render_home_user', id=user['id']))
+            
+        # if password is wrong, user is shown a button to try again
         return render_template('login.html', action='invalid_login')
+    
+    # renders the login template
     return render_template('login.html', action='pass')
-
 
 # --------------------------------------------------------------
 # -------------------- signup Route ----------------------------
@@ -42,7 +48,8 @@ def render_login():
 
 @app.route("/signup/", methods=['GET', 'POST'])
 def render_signup():
-        # Get form data
+
+    # getting emails to check if user is registering with a new email
     user_emails = db.get_email()
 
     if request.method == 'POST':
@@ -61,6 +68,7 @@ def render_signup():
                     'password': password,
                 }
 
+                # adds new user to the db as a dictionary
                 db.add_user(new_user)
                 return redirect(url_for('render_login'))
             else:
@@ -76,12 +84,7 @@ def render_signup():
 @app.route("/home/<id>", methods=['GET', 'POST'])
 def render_home_user(id):
     user = db.get_one_user(id)
-    return render_template('home.html', user=user, action='empty')
-
-@app.route("/home/budget/<id>", methods=['GET', 'POST'])
-def render_home_user_budget(id):
-
-    user = db.get_one_user(id)
+    budget = db.get_budget(id)
 
     if request.method == 'POST':
 
@@ -92,7 +95,7 @@ def render_home_user_budget(id):
         savings = request.form['savings-percentage']
 
         budget = {
-            'user_id': user,
+            'user_id': user['id'],
             'expenses': expenses,
             'wants': wants,
             'savings': savings,
@@ -103,31 +106,32 @@ def render_home_user_budget(id):
         # calculate user income, expenses, wants, savings
 
         sum_income = (
-            request.form['main-income'] + 
-            request.form['passive'] + 
-            request.form['other']
+            int(request.form['main-income']) + 
+            int(request.form['passive']) + 
+            int(request.form['other'])
             )
         sum_expenses = (
-            request.form['mortgage'] +
-            request.form['utilities'] +
-            request.form['transportation'] +
-            request.form['groceries'] +
-            request.form['insurance'] +
-            request.form['debt']
+            int(request.form['mortgage']) + 
+            int(request.form['utilities']) + 
+            int(request.form['transportation']) + 
+            int(request.form['groceries']) + 
+            int(request.form['insurance']) + 
+            int(request.form['debt']) 
         )
         sum_wants = (
-            request.form['personal'] +
-            request.form['dining'] +
-            request.form['shopping']
+            int(request.form['personal']) + 
+            int(request.form['dining']) + 
+            int(request.form['shopping']) 
         )
+
         sum_savings = (
-            request.form['savings'] +
-            request.form['emergency-fund'] +
-            request.form['retirement'] 
+            int(request.form['savings']) + 
+            int(request.form['emergency-fund']) + 
+            int(request.form['retirement'])
         )
 
         user_budget = {
-            'user_id': user,
+            'user_id': user['id'],
             'income': sum_income,
             'expenses': sum_expenses,
             'wants': sum_wants,
@@ -135,7 +139,23 @@ def render_home_user_budget(id):
         }
 
         db.add_user_spending(user_budget)
-    return render_template('home.html', user=user, )
+    return render_template('home.html', user=user, budget=budget)
+
+@app.route("/home/clear/<id>")
+def render_clear_budget(id):
+    db.clear_budget()
+    user = db.get_one_user(id)
+    return render_template('home.html', user=user)
+
+
+@app.route("/home/budget/<id>", methods=['GET', 'POST'])
+def render_home_user_budget(id):
+
+    user = db.get_one_user(id)
+
+    return render_template('budget.html', user=user)
+
+
 
 
 
