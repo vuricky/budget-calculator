@@ -1,1 +1,148 @@
 {% extends "base.html" %}
+
+{% block title %}Budget{% endblock %}
+
+{% block content %}
+
+{% if budget %}
+    <h2 class="text-center">{{ user['name'] }}, Here is your Budget Summary</h2>
+
+    <form action="{{ url_for('render_budget', id=user['id']) }}" method="POST" class="text-center my-3">
+        <button type="submit" class="btn btn-danger">Reset Budget</button>
+    </form>
+    <div class="container">
+      <!-- budget user wants to set -->
+       <h3>Your Goals:</h3>
+        <div class="row">
+            {% for label, progress in budget.items() %}
+                {% if label != "user_id" %}
+                    <div class="col-md-4 col-sm-6 text-center my-3">
+                      <div class="card" style="width:18rem; padding-top: 1rem; padding-bottom: 1.5rem;">
+                        <h3>{{ label | capitalize }}</h3>
+
+                          {# Define color based on label #}
+                          {% set ring_color = "" %}
+                          {% if label == "expenses" %}
+                              {% set ring_color = "red" %}
+                          {% elif label == "wants" %}
+                              {% set ring_color = "blue" %}
+                          {% elif label == "savings" %}
+                              {% set ring_color = "green" %}
+                          {% else %}
+                              {% set ring_color = "gray" %}
+                          {% endif %}
+
+                          <div class="progress-ring mx-auto" data-progress="{{ progress }}" data-ring-color="{{ ring_color }}">
+                              <svg class="ring" viewBox="0 0 100 100">
+                                  <circle class="background" cx="50" cy="50" r="45"></circle>
+                                  <circle class="progress" cx="50" cy="50" r="45"></circle>
+                              </svg>
+                              <div class="progress-text">0%</div>
+                          </div>
+                      </div>
+                          
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- user budget -->
+         <h3>Your Current Spending Based On Your Income:</h3>
+        <div class="row">
+          {% for label, progress in user_budget.items() %}
+              {% if label != "user_id" and label != "income" %}
+                  <div class="col-md-4 col-sm-6 text-center my-3">
+                    <div class="card" style="width:18rem; padding-top: 1rem; padding-bottom: 1.5rem;">
+                      <h3>{{ label | capitalize }}</h3>
+
+                        {# Define color based on label #}
+                        {% set ring_color = "" %}
+                        {% if label == "expenses" %}
+                            {% set ring_color = "red" %}
+                        {% elif label == "wants" %}
+                            {% set ring_color = "blue" %}
+                        {% elif label == "savings" %}
+                            {% set ring_color = "green" %}
+                        {% else %}
+                            {% set ring_color = "gray" %}
+                        {% endif %}
+
+                        <div class="progress-ring mx-auto" data-progress="{{ (progress / user_budget['income']) * 100}} " data-ring-color="{{ ring_color }}">
+                            <svg class="ring" viewBox="0 0 100 100">
+                                <circle class="background" cx="50" cy="50" r="45"></circle>
+                                <circle class="progress" cx="50" cy="50" r="45"></circle>
+                            </svg>
+                            <div class="progress-text">0%</div>
+                        </div>
+                    </div>
+                        
+                  </div>
+              {% endif %}
+          {% endfor %}
+      </div>
+    </div>
+
+{% else %}
+    <div class="text-center">
+        <p>No budget data available. Please create a budget.</p>
+        <a href="{{ url_for('render_home_user', id=user['id']) }}">
+            <button class="btn btn-primary">Create a budget</button>
+        </a>
+    </div>
+{% endif %}
+
+<script>
+    // Function to animate individual progress rings
+    function animateProgressRing(ringElement, targetProgress) {
+        const progressText = ringElement.querySelector('.progress-text');
+        const progressCircle = ringElement.querySelector('.progress');
+        const duration = 3000; // Animation duration in ms
+        const circumference = 2 * Math.PI * 45; // 2 * π * r
+        progressCircle.style.strokeDasharray = circumference;
+
+        // Get ring color from data-ring-color attribute
+        const ringColor = ringElement.dataset.ringColor;
+        let color;
+        if (ringColor === 'red') {
+            color = "#e83225";  // Example color for expenses
+        } else if (ringColor === 'blue') {
+            color = "#1E90FF";  // Example color for wants
+        } else if (ringColor === 'green') {
+            color = "#32CD32";  // Example color for savings
+        } else {
+            color = "#D3D3D3";  // Default gray color
+        }
+
+        progressCircle.style.stroke = color;  // Set the color for the ring
+
+        let startTime;
+
+        function animate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+
+            const progress = Math.min(
+                Math.round((elapsed / duration) * targetProgress),
+                targetProgress
+            );
+
+            progressText.textContent = `${progress}%`;
+            progressCircle.style.strokeDashoffset =
+                circumference - (circumference * progress) / 100;
+
+            if (elapsed < duration) {
+                requestAnimationFrame(animate);
+            }
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    // Animate all rings
+    document.querySelectorAll('.progress-ring').forEach((ringElement) => {
+        const targetProgress = parseInt(ringElement.dataset.progress, 10); // Ensure it's an integer
+        animateProgressRing(ringElement, targetProgress);
+    });
+</script>
+
+{% endblock %}

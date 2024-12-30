@@ -27,3 +27,76 @@
 .bd-mode-toggle .dropdown-menu .active .bi {
     display: block !important;
 }
+
+
+:root {
+    --progress: 0; /* Start progress at 0% */
+  }
+  
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .progress-ring {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    animation: animate-progress 3s forwards;
+  }
+  
+  .ring {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg); /* Rotate to start at the top */
+  }
+  
+  circle {
+    fill: none;
+    stroke-width: 10;
+    r: 45;
+    cx: 50;
+    cy: 50;
+  }
+  
+  .background {
+    stroke: #e6e6e6;
+  }
+  
+  .progress {
+    stroke: #4caf50;
+    stroke-dasharray: 283; /* 2 * Math.PI * radius */
+    stroke-dashoffset: calc(283 - (283 * var(--progress)) / 100);
+    transition: stroke-dashoffset 0.5s ease;
+  }
+  
+  .progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: bold;
+    animation: update-text 3s forwards;
+  }
+  
+  /* Keyframes for progress animation */
+  @keyframes animate-progress {
+    from {
+      --progress: 0;
+    }
+    to {
+      --progress: 75; /* Target progress */
+    }
+  }
+  
+  /* Keyframes for updating text */
+  @keyframes update-text {
+    0% {
+      content: "0%";
+    }
+}

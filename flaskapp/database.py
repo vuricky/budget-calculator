@@ -85,11 +85,28 @@ def get_budget(id):
     conn.close()
     return budget
 
+def get_user_budget(id):
+    conn = get_connection()
+    with conn.cursor() as curr:
+        curr.execute("SELECT * FROM user_budget WHERE user_id =%s", (id))
+        user_budget = curr.fetchone()
+    conn.commit()
+    conn.close()
+    return user_budget
+
 def clear_budget():
     conn = get_connection()
     with conn.cursor() as curr:
         curr.execute(
-            'delete from budget',
+            'delete from budget'
+        )
+    conn.commit()
+    conn.close()
+
+def clear_user_budget():
+    conn = get_connection()
+    with conn.cursor() as curr:
+        curr.execute(
             'delete from user_budget'
         )
     conn.commit()
